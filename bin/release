@@ -1,2 +1,5 @@
-#!/bin/sh
-echo "--- {}"
+#!/usr/bin/env bash
+set -e
+
+# Always pass detection
+exit 0

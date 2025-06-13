@@ -1,5 +1,5 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -e
 
-# valid for all
-echo "1p"
+# Always pass detection
 exit 0

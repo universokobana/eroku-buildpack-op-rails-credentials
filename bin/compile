@@ -1,8 +1,38 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -e
 
-indent() {
-  sed -u 's/^/       /'
+export_env_dir() {
+	local env_dir=$1
+	local whitelist_regex=${2:-''}
+	local blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH|IFS)$'}
+	if [ -d "$env_dir" ]; then
+		for e in $(ls $env_dir); do
+			echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+			export "$e=$(cat $env_dir/$e)"
+			:
+		done
+	fi
 }
+
+env_dir=${3:-}
+export_env_dir "$env_dir"
+
+echo "--------> Checking for environment variables"
+echo "CREDENTIALS_ENVIRONMENT: ${CREDENTIALS_ENVIRONMENT:-not set}"
+echo "CREDENTIALS_PATH: ${CREDENTIALS_PATH:-not set}"
+
+if [[ -z "$CREDENTIALS_ENVIRONMENT" ]]; then
+  echo "ERROR: CREDENTIALS_ENVIRONMENT is not set."
+  exit 1
+fi
+if [[ -z "$CREDENTIALS_PATH" ]]; then
+  echo "ERROR: CREDENTIALS_PATH is not set."
+  exit 1
+fi
+if [[ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]]; then
+  echo "ERROR: OP_SERVICE_ACCOUNT_TOKEN is not set."
+  exit 1
+fi
 
 CREDENTIALS_FILEPATH="./config/credentials/$CREDENTIALS_ENVIRONMENT.yml.enc"
 BUILD_DIR=$1
@@ -11,4 +41,5 @@ CREDENTIALS_DIR="config/credentials"
 echo "--------> Injecting file $CREDENTIALS_FILEPATH"
 cd $BUILD_DIR
 mkdir -p $CREDENTIALS_DIR
-op read --force --out-file $CREDENTIALS_FILEPATH $CREDENTIALS_PATH
+ls /app/vendor/1password/bin
+/app/vendor/1password/bin/op read --force --out-file $CREDENTIALS_FILEPATH $CREDENTIALS_PATH
