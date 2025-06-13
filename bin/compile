@@ -1,0 +1,14 @@
+#!/bin/sh
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+CREDENTIALS_FILEPATH="./config/credentials/$CREDENTIALS_ENVIRONMENT.yml.enc"
+BUILD_DIR=$1
+CREDENTIALS_DIR="config/credentials"
+
+echo "--------> Injecting file $CREDENTIALS_FILEPATH"
+cd $BUILD_DIR
+mkdir -p $CREDENTIALS_DIR
+op read --force --out-file $CREDENTIALS_FILEPATH $CREDENTIALS_PATH
