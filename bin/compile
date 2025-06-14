@@ -18,14 +18,9 @@ env_dir=${3:-}
 export_env_dir "$env_dir"
 
 echo "--------> Checking for environment variables"
-echo "CREDENTIALS_ENVIRONMENT: ${CREDENTIALS_ENVIRONMENT:-not set}"
 echo "CREDENTIALS_VAULT: ${CREDENTIALS_VAULT:-not set}"
 echo "CREDENTIALS_ITEM: ${CREDENTIALS_ITEM:-not set}"
 
-if [[ -z "$CREDENTIALS_ENVIRONMENT" ]]; then
-  echo "ERROR: CREDENTIALS_ENVIRONMENT is not set."
-  exit 1
-fi
 if [[ -z "$CREDENTIALS_VAULT" ]]; then
   echo "ERROR: CREDENTIALS_VAULT is not set."
   exit 1
@@ -42,11 +37,11 @@ fi
 BUILD_DIR=$1
 cd $BUILD_DIR
 
-CREDENTIALS_DIR="config/credentials"
+CREDENTIALS_DIR="config"
 mkdir -p $CREDENTIALS_DIR
 
 echo "--------> Injecting encrypted credentials..."
-/app/vendor/1password/bin/op document get --force --out-file $CREDENTIALS_DIR/$CREDENTIALS_ENVIRONMENT.yml.enc --vault $CREDENTIALS_VAULT $CREDENTIALS_ITEM
+/app/vendor/1password/bin/op document get --force --out-file $CREDENTIALS_DIR/credentials.yml.enc --vault $CREDENTIALS_VAULT $CREDENTIALS_ITEM
 
 echo "--------> Injecting rails master key..."
-/app/vendor/1password/bin/op read --force --out-file $CREDENTIALS_DIR/$CREDENTIALS_ENVIRONMENT.key op://$CREDENTIALS_VAULT/$CREDENTIALS_ITEM/RAILS_MASTER_KEY
+/app/vendor/1password/bin/op read --force --out-file $CREDENTIALS_DIR/master.key op://$CREDENTIALS_VAULT/$CREDENTIALS_ITEM/RAILS_MASTER_KEY
