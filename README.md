@@ -22,10 +22,14 @@ heroku config:add CREDENTIALS_PATH=op://CLI_STAGING/YOUR_APP/CREDENTIALS CREDENT
 
 ## Usage
 
-Add the buildpack to your application.
+This buildpacks depends on `missive/heroku-buildpack-1password-cli`
+
+Add the buildpacks to your application.
 
 ```bash
-heroku buildpacks:add https://github.com/universokobana/heroku-buildpack-op-rails-credentials.git -a my_app
+heroku buildpacks:add -i 1 https://github.com/universokobana/heroku-buildpack-op-rails-credentials.git -a my_app
+
+heroku buildpacks:add -i 1 https://github.com/missive/heroku-buildpack-1password-cli -a my_app
 ```
 
 ## Output
