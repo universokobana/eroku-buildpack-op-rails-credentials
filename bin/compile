@@ -39,12 +39,14 @@ if [[ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]]; then
   exit 1
 fi
 
-CREDENTIALS_FILEPATH="./config/credentials/$CREDENTIALS_ENVIRONMENT.yml.enc"
 BUILD_DIR=$1
-CREDENTIALS_DIR="config/credentials"
-
-echo "--------> Injecting file $CREDENTIALS_FILEPATH"
 cd $BUILD_DIR
+
+CREDENTIALS_DIR="config/credentials"
 mkdir -p $CREDENTIALS_DIR
-ls /app/vendor/1password/bin
-/app/vendor/1password/bin/op document get --force --out-file $CREDENTIALS_FILEPATH --vault $CREDENTIALS_VAULT $CREDENTIALS_ITEM
+
+echo "--------> Injecting encrypted credentials..."
+/app/vendor/1password/bin/op document get --force --out-file $CREDENTIALS_DIR/$CREDENTIALS_ENVIRONMENT.yml.enc --vault $CREDENTIALS_VAULT $CREDENTIALS_ITEM
+
+echo "--------> Injecting rails master key..."
+/app/vendor/1password/bin/op read --force --out-file $CREDENTIALS_DIR/$CREDENTIALS_ENVIRONMENT.key op://$CREDENTIALS_VAULT/$CREDENTIALS_ITEM/RAILS_MASTER_KEY
