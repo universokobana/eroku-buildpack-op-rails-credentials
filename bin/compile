@@ -19,14 +19,19 @@ export_env_dir "$env_dir"
 
 echo "--------> Checking for environment variables"
 echo "CREDENTIALS_ENVIRONMENT: ${CREDENTIALS_ENVIRONMENT:-not set}"
-echo "CREDENTIALS_PATH: ${CREDENTIALS_PATH:-not set}"
+echo "CREDENTIALS_VAULT: ${CREDENTIALS_VAULT:-not set}"
+echo "CREDENTIALS_ITEM: ${CREDENTIALS_ITEM:-not set}"
 
 if [[ -z "$CREDENTIALS_ENVIRONMENT" ]]; then
   echo "ERROR: CREDENTIALS_ENVIRONMENT is not set."
   exit 1
 fi
-if [[ -z "$CREDENTIALS_PATH" ]]; then
-  echo "ERROR: CREDENTIALS_PATH is not set."
+if [[ -z "$CREDENTIALS_VAULT" ]]; then
+  echo "ERROR: CREDENTIALS_VAULT is not set."
+  exit 1
+fi
+if [[ -z "$CREDENTIALS_ITEM" ]]; then
+  echo "ERROR: CREDENTIALS_ITEM is not set."
   exit 1
 fi
 if [[ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]]; then
@@ -42,4 +47,4 @@ echo "--------> Injecting file $CREDENTIALS_FILEPATH"
 cd $BUILD_DIR
 mkdir -p $CREDENTIALS_DIR
 ls /app/vendor/1password/bin
-/app/vendor/1password/bin/op read --force --out-file $CREDENTIALS_FILEPATH $CREDENTIALS_PATH
+/app/vendor/1password/bin/op document get --force --out-file $CREDENTIALS_FILEPATH --vault $CREDENTIALS_VAULT $CREDENTIALS_ITEM
