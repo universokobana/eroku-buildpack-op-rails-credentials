@@ -34,6 +34,20 @@ if [[ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]]; then
   exit 1
 fi
 
+if command -v op >/dev/null 2>&1; then
+  echo "--------> 1Password CLI already installed!"
+else
+  echo "--------> Installing 1Password CLI..."
+  ARCH="amd64" && \
+  wget "https://cache.agilebits.com/dist/1P/op2/pkg/v2.31.1/op_linux_${ARCH}_v2.31.1.zip" -O op.zip && \
+  unzip -d op op.zip && \
+  mv op op_dir && \
+  mv op_dir/op . && \
+  rm -r op.zip op_dir && \
+  chmod +x op
+fi
+
+OP_DIR="$(pwd)"
 BUILD_DIR=$1
 cd $BUILD_DIR
 
@@ -41,14 +55,14 @@ CREDENTIALS_DIR="config"
 mkdir -p $CREDENTIALS_DIR
 
 echo "--------> Injecting encrypted credentials..."
-/app/vendor/1password/bin/op document get --force --out-file $CREDENTIALS_DIR/credentials.yml.enc --vault $CREDENTIALS_VAULT $CREDENTIALS_ITEM
+$OP_DIR/op document get --force --out-file $CREDENTIALS_DIR/credentials.yml.enc --vault $CREDENTIALS_VAULT $CREDENTIALS_ITEM
 if [[ ! -s $CREDENTIALS_DIR/credentials.yml.enc ]]; then
   echo "ERROR: The credentials file is empty or does not exist."
   exit 1
 fi
 
 echo "--------> Injecting rails master key..."
-/app/vendor/1password/bin/op read --force --out-file $CREDENTIALS_DIR/master.key op://$CREDENTIALS_VAULT/$CREDENTIALS_ITEM/RAILS_MASTER_KEY
+$OP_DIR/op read --force --out-file $CREDENTIALS_DIR/master.key op://$CREDENTIALS_VAULT/$CREDENTIALS_ITEM/RAILS_MASTER_KEY
 if [[ ! -s $CREDENTIALS_DIR/master.key ]]; then
   echo "ERROR: The rails master key file is empty or does not exist."
   exit 1
